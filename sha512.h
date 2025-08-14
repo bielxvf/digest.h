@@ -4,7 +4,8 @@
 #ifndef _SHA512_H
 #define _SHA512_H
 
-#include <stdint.h>
+typedef unsigned char uint8_t;
+typedef unsigned long long uint64_t;
 
 const uint64_t sha512_K[80] = {
   0x428a2f98d728ae22, 0x7137449123ef65cd,
@@ -62,7 +63,6 @@ int sha512_digest(uint8_t *source, uint64_t source_length, uint64_t *destination
 
 #ifdef SHA512_IMPLEMENTATION
 
-#include <stdint.h>
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
