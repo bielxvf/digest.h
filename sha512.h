@@ -4,6 +4,8 @@
 #ifndef _SHA512_H
 #define _SHA512_H
 
+#include <stdint.h>
+
 const uint64_t sha512_K[80] = {
   0x428a2f98d728ae22, 0x7137449123ef65cd,
   0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc,
