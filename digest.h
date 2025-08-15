@@ -1,13 +1,13 @@
 /* 
-    simple header-only "library" to calculate a SHA-512 hash
+    simple header-only "library" for multiple hash digests
 */
-#ifndef _SHA512_H
-#define _SHA512_H
+#ifndef _DIGEST_H
+#define _DIGEST_H
 
 typedef unsigned char uint8_t;
 typedef unsigned long long uint64_t;
 
-const uint64_t sha512_K[80] = {
+const uint64_t digest_sha512_K[80] = {
   0x428a2f98d728ae22, 0x7137449123ef65cd,
   0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc,
   0x3956c25bf348b538, 0x59f111f1b605d019,
@@ -50,64 +50,64 @@ const uint64_t sha512_K[80] = {
   0x5fcb6fab3ad6faec, 0x6c44198c4a475817
 };
 
-const uint64_t sha512_H[8] = {
+const uint64_t digest_sha512_H[8] = {
   0x6a09e667f3bcc908, 0xbb67ae8584caa73b,
   0x3c6ef372fe94f82b, 0xa54ff53a5f1d36f1,
   0x510e527fade682d1, 0x9b05688c2b3e6c1f,
   0x1f83d9abfb41bd6b, 0x5be0cd19137e2179
 };
 
-int sha512_digest(uint8_t *source, uint64_t source_length, uint64_t *destination);
+int digest_sha512(uint8_t *source, uint64_t source_length, uint64_t *destination);
 
-#endif /* _SHA512_H */
+#endif /* _DIGEST_H */
 
-#ifdef SHA512_IMPLEMENTATION
+#ifdef DIGEST_IMPLEMENTATION
 
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-static uint64_t sha512_Ch(uint64_t x, uint64_t y, uint64_t z)
+static uint64_t digest_sha512_Ch(uint64_t x, uint64_t y, uint64_t z)
 {
   return (x & y) ^ (~x & z);
 }
 
-static uint64_t sha512_Maj(uint64_t x, uint64_t y, uint64_t z)
+static uint64_t digest_sha512_Maj(uint64_t x, uint64_t y, uint64_t z)
 {
   return (x & y) ^ (x & z) ^ (y & z);
 }
 
-static uint64_t sha512_rotr(uint64_t x, unsigned short n)
+static uint64_t digest_sha512_rotr(uint64_t x, unsigned short n)
 {
   return (x >> n) | (x << (64 - n));
 }
 
-static uint64_t sha512_S_0(uint64_t x)
+static uint64_t digest_sha512_S_0(uint64_t x)
 {
-  return sha512_rotr(x, 28) ^ sha512_rotr(x, 34) ^ sha512_rotr(x, 39);
+  return digest_sha512_rotr(x, 28) ^ digest_sha512_rotr(x, 34) ^ digest_sha512_rotr(x, 39);
 }
 
-static uint64_t sha512_S_1(uint64_t x)
+static uint64_t digest_sha512_S_1(uint64_t x)
 {
-  return sha512_rotr(x, 14) ^ sha512_rotr(x, 18) ^ sha512_rotr(x, 41);
+  return digest_sha512_rotr(x, 14) ^ digest_sha512_rotr(x, 18) ^ digest_sha512_rotr(x, 41);
 }
 
-static uint64_t sha512_s_0(uint64_t x)
+static uint64_t digest_sha512_s_0(uint64_t x)
 {
-  return sha512_rotr(x, 1) ^ sha512_rotr(x, 8) ^ (x >> 7);
+  return digest_sha512_rotr(x, 1) ^ digest_sha512_rotr(x, 8) ^ (x >> 7);
 }
 
-static uint64_t sha512_s_1(uint64_t x)
+static uint64_t digest_sha512_s_1(uint64_t x)
 {
-  return sha512_rotr(x, 19) ^ sha512_rotr(x, 61) ^ (x >> 6);
+  return digest_sha512_rotr(x, 19) ^ digest_sha512_rotr(x, 61) ^ (x >> 6);
 }
 
 /* source: message, array of bytes */
 /* source_length: message length in bytes */
 /* destination: uint64_t[8] (result) */
 /* RETURN non-zero on error and sets errno (indirectly) */
-int sha512_digest(uint8_t *source, uint64_t source_length, uint64_t *destination)
+int digest_sha512(uint8_t *source, uint64_t source_length, uint64_t *destination)
 {
   uint8_t *data = NULL;
   uint64_t data_length;
@@ -144,7 +144,7 @@ int sha512_digest(uint8_t *source, uint64_t source_length, uint64_t *destination
   }
   
   for (i = 0; i < 8; i++) {
-    hash[i] = sha512_H[i];
+    hash[i] = digest_sha512_H[i];
   }
 
   for (it = data, end = &data[data_length]; it != end; it += 128) {
@@ -159,7 +159,7 @@ int sha512_digest(uint8_t *source, uint64_t source_length, uint64_t *destination
     }
 
     for (i = 16; i < 80; i++) {
-      W[i] = sha512_s_1(W[i - 2]) + W[i - 7] + sha512_s_0(W[i - 15]) + W[i - 16];
+      W[i] = digest_sha512_s_1(W[i - 2]) + W[i - 7] + digest_sha512_s_0(W[i - 15]) + W[i - 16];
     }
 
     a = hash[0];
@@ -172,8 +172,8 @@ int sha512_digest(uint8_t *source, uint64_t source_length, uint64_t *destination
     h = hash[7];
 
     for (i = 0; i < 80; i++) {
-      T_1 = h + sha512_S_1(e) + sha512_Ch(e, f, g) + sha512_K[i] + W[i];
-      T_2 = sha512_S_0(a) + sha512_Maj(a, b, c);
+      T_1 = h + digest_sha512_S_1(e) + digest_sha512_Ch(e, f, g) + digest_sha512_K[i] + W[i];
+      T_2 = digest_sha512_S_0(a) + digest_sha512_Maj(a, b, c);
       h = g;
       g = f;
       f = e;
@@ -203,11 +203,12 @@ int sha512_digest(uint8_t *source, uint64_t source_length, uint64_t *destination
   return 0;
 }
 
-#endif /* SHA512_IMPLEMENTATION */
+#endif /* DIGEST_IMPLEMENTATION */
 
 /*
     Revision history:
 
+      2.0.0 (2025-8-15) renamed to digest, added prefix
       1.0.0 (2025-8-14) first release
 */
 

@@ -1,5 +1,5 @@
-#define SHA512_IMPLEMENTATION
-#include "sha512.h"
+#define DIGEST_IMPLEMENTATION
+#include "digest.h"
 
 int main(int argc, char **argv)
 {
@@ -12,7 +12,7 @@ int main(int argc, char **argv)
   };
   unsigned short i;
 
-  if (sha512_digest("abc", 3, hash) != 0) {
+  if (digest_sha512("abc", 3, hash) != 0) {
     return 1;
   }
   for (i = 0; i < 8; i++) {
@@ -21,5 +21,6 @@ int main(int argc, char **argv)
     }
   }
 
+  printf("PASSED!\n");
   return 0;
 }
