@@ -1,6 +1,8 @@
 #define DIGEST_IMPLEMENTATION
 #include "digest.h"
 
+#include <stdio.h>
+
 int main(int argc, char **argv)
 {
   uint64_t hash[8];
