@@ -4,11 +4,33 @@
 #ifndef _DIGEST_H
 #define _DIGEST_H
 
-/* pretty sure this is just a hack */
-typedef unsigned char uint8_t;
-typedef unsigned long long uint64_t;
-typedef unsigned int uint32_t;
+#ifndef SHA_TYPES_DEFINED
+#define SHA_TYPES_DEFINED
 
+typedef unsigned char  uint8_t;
+typedef unsigned short uint16_t;
+
+#if defined(_MSC_VER)
+/* Microsoft compilers use LLP64 on 64-bit */
+typedef unsigned int   uint32_t;
+typedef unsigned __int64 uint64_t;
+
+#else
+/* Assume GCC/Clang style */
+# if __LP64__ || __x86_64__ || __ppc64__ || __aarch64__
+    /* LP64: long = 64, int = 32 */
+    typedef unsigned int  uint32_t;
+    typedef unsigned long uint64_t;
+# else
+    /* ILP32: long = 32, int = 32, long long = 64 */
+    typedef unsigned int       uint32_t;
+    typedef unsigned long long uint64_t;
+# endif
+#endif
+
+#endif /* SHA_TYPES_DEFINED */
+
+/* API */
 int digest_sha512(uint8_t *source, uint64_t source_length, uint64_t *destination);
 int digest_sha384(uint8_t *source, uint64_t source_length, uint64_t *destination);
 int digest_sha256(uint8_t *source, uint32_t source_length, uint32_t *destination);
